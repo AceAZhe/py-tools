@@ -70,13 +70,15 @@ class MainWindow(QMainWindow):
 
 
   def setPostion(self): #设置窗口位置     
-    self.move(10,10)
+    d_w,d_h=self.utils.get_desktop_size()
+    self.move(d_w-self.app_width-5,d_h-self.app_height-75)
  
 class SaveVideo(QWidget):
     def __init__(self):
         super().__init__()
       
     def save(self,videoUrl,desktopPathUrl):
+      self.setWindowFlags(Qt.WindowStaysOnTopHint)
       filename=QFileDialog.getSaveFileName(self,'保存录屏',desktopPathUrl)  
       if filename[0]:
         shutil.copy(videoUrl,filename[0])  

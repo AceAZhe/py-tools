@@ -33,6 +33,7 @@ class ScreenCap(object):
         os.mkdir(self.videoPath)
 
     def run(self,win,save_video):
+        self.clearTempFile()
         win.setWindowState(Qt.WindowMinimized)
         self.save_video=save_video
         time.sleep(self.sleepTime)
@@ -65,5 +66,3 @@ class ScreenCap(object):
         if key == keyboard.Key.esc:
             self.flag = True
             return False  # 返回False，键盘监听结束！
-
-ScreenCap()
