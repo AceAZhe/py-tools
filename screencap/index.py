@@ -19,11 +19,10 @@ class ScreenCap(object):
         self.flag=False
         self.sleepTime=0.3
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.videoPath = os.path.join(self.current_dir,'..','temp')
-        self.clearTempFile()
+        self.videoPath = os.path.join(self.current_dir,'..','temp')     
         self.videoUrl=None
         self.videoPathName=None
-        self.save_video=None
+        self.caps_run_result=None
         
     def setSleepTime(self,val):
         self.sleepTime=val
@@ -32,10 +31,9 @@ class ScreenCap(object):
         shutil.rmtree(self.videoPath)
         os.mkdir(self.videoPath)
 
-    def run(self,win,save_video):
+    def run(self,caps_run_result):
         self.clearTempFile()
-        win.setWindowState(Qt.WindowMinimized)
-        self.save_video=save_video
+        self.caps_run_result=caps_run_result
         time.sleep(self.sleepTime)
         th = threading.Thread(target=self.video_record)
         th.start()
@@ -55,10 +53,8 @@ class ScreenCap(object):
             imm = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR)  # 转为opencv的BGR格式
             video.write(imm)
             if self.flag:
-                print('ESC终止录屏')    
-                desktopPath=os.path.join(os.path.expanduser('~'),"Desktop")
-                desktopPathUrl=os.path.join(desktopPath,self.videoPathName)
-                self.save_video.save(self.videoUrl,desktopPathUrl)             
+                print('ESC终止录屏')  
+                self.caps_run_result(self.videoUrl, self.videoPathName)            
                 break
         video.release()
 

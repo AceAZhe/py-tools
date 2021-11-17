@@ -11,25 +11,16 @@ class ScreenShotActs():
     super().__init__()
     self.current_dir = os.path.dirname(os.path.abspath(__file__))
     self.current_exe = os.path.join(self.current_dir,'PrintScr.exe')
-    self.sleepTime=0.3
+    self.sleepTime = 0.1
 
   def setSleepTime(self,val):
     self.sleepTime=val
 
-  def run(self,win,img_win):
-    win.setWindowState(Qt.WindowMinimized)
+  def run(self):
     time.sleep(self.sleepTime)
     res = os.system(self.current_exe) 
+    return res
     
-    if res==1:
-      img_win.show()
-      img_win.pasteImage()  
-    else:
-      if win.isMaximized():
-        win.showNormal()
-      else:
-        win.showMaximized()
-      win.setPostion()
 
 
 

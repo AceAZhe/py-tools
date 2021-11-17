@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from win32api import GetSystemMetrics
 import os
+import sys
+
 
 class UtilTools(object):
   def __init__(self):
@@ -28,7 +30,7 @@ class ClipBoard(QWidget):
   def initUI(self):
     d_w,d_h=self.utils.get_desktop_size()
     self.setWindowFlags(Qt.WindowStaysOnTopHint)
-    self.resize(d_w,d_h)
+    self.setWindowState(Qt.WindowMaximized )
     self.imageLabel=QLabel()
     layout = QGridLayout()
     layout.setContentsMargins(0,0,0,0) #设置布局没有边缘空白
