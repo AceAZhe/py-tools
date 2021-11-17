@@ -9,6 +9,7 @@ from screencap.index import *
 import shutil
 from colorfinder.index import *
 from videoplay.index import *
+from tools.index import *
 
 img_win = None
 save_video=None
@@ -22,6 +23,7 @@ class MainWindow(QMainWindow):
     self.app_height=24
     self.setFixedSize(self.app_width, self.app_height);
     self.utils=UtilTools()
+    self.tools = Tools()
     self.acts=ScreenShotActs()
     self.caps=ScreenCap()
     self.initUI()
@@ -87,7 +89,7 @@ class MainWindow(QMainWindow):
 
     m5 = menubar.addMenu('工具')
     m5Act1 = QAction(QIcon(''), '修改系统语言', self)     
-    # m5Act1.triggered.connect(lambda:self.getColorFinderRun())
+    m5Act1.triggered.connect(lambda: self.tools.py_call_shell(self.tools.current_bat))
     m5.addAction(m5Act1)
 
   def videoRun(self): #选择视频
