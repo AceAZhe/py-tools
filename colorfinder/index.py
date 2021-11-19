@@ -1,12 +1,12 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from utils import *
+from win32api import GetSystemMetrics
+
 
 class ColorFinder(QWidget):
     def __init__(self, parent=None):
         super(ColorFinder, self).__init__(parent)
-        self.utils=UtilTools()
         self.app_width = 285
         self.app_height = 75
         self.win = None
@@ -14,6 +14,9 @@ class ColorFinder(QWidget):
         timer = QTimer(self)
         timer.timeout.connect(self.slotPickColor)
         timer.start(20)
+        
+    def get_desktop_size(self):
+      return (GetSystemMetrics (0),GetSystemMetrics (1))
 
     def run(self, win):
       self.win = win
@@ -39,10 +42,9 @@ class ColorFinder(QWidget):
         list(map(lambda txt, row: mainLayout.addWidget(txt, row, 2, 1, 1), txts, range(3)))
         
         self.resize(self.app_width , self.app_height)
-        d_w,d_h=self.utils.get_desktop_size()
+        d_w,d_h = self.get_desktop_size()
         self.move(d_w-self.app_width-5,d_h-self.app_height-100)
         self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint | Qt.WindowStaysOnTopHint)
- 
         self.setWindowTitle('吸色器')
  
     def slotPickColor(self):
@@ -63,3 +65,5 @@ class ColorFinder(QWidget):
         hexs = list(map(lambda x: str(hex(x)).replace('0x', '').upper(), [r, g, b]))
         strCSS = '#{:0>2s}{:0>2s}{:0>2s}'.format(*hexs)
         self.txtCSS.setText(strCSS)
+
+

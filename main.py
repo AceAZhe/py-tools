@@ -1,60 +1,84 @@
-import sys
+"""
+  @author Alex
+  @date 2021/11/19
+  @desc 主进程，入口文件main.py
+"""
 
+import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from utils import *
 from screenshot.index import *
 from screencap.index import *
-import shutil
 from colorfinder.index import *
 from videoplay.index import *
 from tools.index import *
 
-img_win = None
-save_video=None
-color_win = None
+win = None
+color_finder_win = None
+author_win  = None
 
 class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
-    self.app_version='1.0.0'
-    self.app_width=300
-    self.app_height=24
-    self.setFixedSize(self.app_width, self.app_height);
-    self.utils=UtilTools()
+    self.app_version = '1.0.0'
+    self.app_width = 282
+    self.app_height = 24
+    self.utils = UtilTools()
     self.tools = Tools()
-    self.acts=ScreenShotActs()
-    self.caps=ScreenCap()
+    self.acts = ScreenShotActs()
+    self.caps = ScreenCap()
     self.initUI()
 
   def initUI(self): #初始化界面UI
+    self.setFixedSize(self.app_width, self.app_height);
     self.resize(self.app_width, self.app_height)
     self.setPostion()
-    self.setWindowIcon(QIcon('icon.png'))   
-    self.setWindowTitle('Ace：工具箱 '+self.app_version)   
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    iconPath = os.path.join(current_dir,'static/icon.png') 
+    self.setWindowIcon(QIcon(iconPath))   
+    self.setWindowTitle('Ace：工具箱 v'+self.app_version)   
     self.setMenubar() 
     self.setWindowFlags(Qt.WindowStaysOnTopHint)
-    self.show()
   
-  def actsRun(self):
+  def actsRun(self): #屏幕截取
     win.hide()
     res = self.acts.run()
-    win.show()
+    win.showNormal()
     win.setPostion()
     if res==1:
-      img_win.show()
-      img_win.pasteImage()  
+      clip_board_win = ClipBoard()
+      clip_board_win.pasteImage()  
    
-  def capsRun(self):
+  def capsRun(self): #屏幕录制
     win.hide()
     self.caps.run(self.capsRunResult)
 
   def capsRunResult(self,videoUrl,videoPathName):
-    win.show()
-    desktopPath=os.path.join(os.path.expanduser('~'),"Desktop")
-    desktopPathUrl=os.path.join(desktopPath,videoPathName)
-    save_video.save(videoUrl,desktopPathUrl)
+    win.showNormal()
+    save_video = SaveVideo()
+    save_video.save(videoUrl,videoPathName)
+
+  def videoPalyRun(self): #选择视频
+    dir = QFileDialog.getOpenFileName(self, "选择视频", 'C:/', "All Files (*)")
+    if dir[0]:
+      try:
+        video_win = VideoPlay(dir[0])
+        video_win.run()
+      except:
+        QMessageBox.warning(self, "警告", "未知错误" )
+
+  def getColorFinderRun(self):  #取色器
+    self.hide()
+    color_finder_win.run(self)
+
+  def rulerRun(self): #直尺 
+    QMessageBox.warning(self, "警告", "功能暂未开放" )
+
+  def aboutAuthorRun(self): #关于作者
+    author_win.show()
+    
 
   def setMenubar(self):
     menubar = self.menuBar()
@@ -79,7 +103,7 @@ class MainWindow(QMainWindow):
 
     m3 = menubar.addMenu('播放')
     m3Act1 = QAction(QIcon(''), '选择视频', self)     
-    m3Act1.triggered.connect(self.videoRun)
+    m3Act1.triggered.connect(self.videoPalyRun)
     m3.addAction(m3Act1)
 
     m4 = menubar.addMenu('取色')
@@ -87,20 +111,22 @@ class MainWindow(QMainWindow):
     m4Act1.triggered.connect(lambda:self.getColorFinderRun())
     m4.addAction(m4Act1)
 
-    m5 = menubar.addMenu('工具')
-    m5Act1 = QAction(QIcon(''), '修改系统语言', self)     
-    m5Act1.triggered.connect(lambda: self.tools.py_call_shell(self.tools.current_bat))
+    m5 = menubar.addMenu('直尺')
+    m5Act1 = QAction(QIcon(''), '屏幕直尺', self)     
+    m5Act1.triggered.connect(lambda:self.rulerRun())
     m5.addAction(m5Act1)
 
-  def videoRun(self): #选择视频
-    dir = QFileDialog.getOpenFileName(self, "选择视频", 'C:/', "All Files (*)")
-    if dir[0]:
-      video_win = VideoPlay(dir[0])
-      video_win.run(win)
 
-  def getColorFinderRun(self):
-    self.hide()
-    color_win.run(self)
+    m6 = menubar.addMenu('工具')
+    m6Act1 = QAction(QIcon(''), '修改系统语言', self)     
+    m6Act1.triggered.connect(lambda: self.tools.py_call_shell(self.tools.current_bat))
+    m6.addAction(m6Act1)
+
+    m7 = menubar.addMenu('关于')
+    m7Act1 = QAction(QIcon(''), '关于作者', self)     
+    m7Act1.triggered.connect(lambda:self.aboutAuthorRun())
+    m7.addAction(m7Act1)
+
 
   def setSleepTime(self,static,mAct):
     text, ok = QInputDialog.getText(self, '设置延时', '请输入延时（秒）：')    
@@ -119,21 +145,11 @@ class MainWindow(QMainWindow):
   def setPostion(self): #设置窗口位置     
     d_w,d_h=self.utils.get_desktop_size()
     self.move(d_w-self.app_width-5,d_h-self.app_height-75)
- 
-class SaveVideo(QWidget):
-    def __init__(self):
-        super().__init__()
-      
-    def save(self,videoUrl,desktopPathUrl):
-      self.setWindowFlags(Qt.WindowStaysOnTopHint)
-      filename=QFileDialog.getSaveFileName(self,'保存录屏',desktopPathUrl)  
-      if filename[0]:
-        shutil.copy(videoUrl,filename[0])  
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    img_win=ClipBoard()
-    color_win = ColorFinder()
+    color_finder_win = ColorFinder()
+    author_win = AboutAuthor()
     win = MainWindow()
-    save_video=SaveVideo()
+    win.show()
     sys.exit(app.exec_())

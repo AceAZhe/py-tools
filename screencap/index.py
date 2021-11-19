@@ -16,13 +16,13 @@ import shutil
 class ScreenCap(object):
     def __init__(self):
         super().__init__()
-        self.flag=False
+        self.flag = False
         self.sleepTime=0.3
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.videoPath = os.path.join(self.current_dir,'..','temp')     
-        self.videoUrl=None
-        self.videoPathName=None
-        self.caps_run_result=None
+        self.videoPath = os.path.join(self.current_dir,'..','static/temp')     
+        self.videoUrl = None
+        self.videoPathName = None
+        self.caps_run_result = None
         
     def setSleepTime(self,val):
         self.sleepTime=val
@@ -31,8 +31,8 @@ class ScreenCap(object):
         shutil.rmtree(self.videoPath)
         os.mkdir(self.videoPath)
 
-    def run(self,caps_run_result):
-        self.clearTempFile()
+    def run(self,caps_run_result):   
+        self.flag = False
         self.caps_run_result=caps_run_result
         time.sleep(self.sleepTime)
         th = threading.Thread(target=self.video_record)
