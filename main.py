@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     iconPath = os.path.join(current_dir,'static/icon.png') 
     self.setWindowIcon(QIcon(iconPath))   
-    self.setWindowTitle('Ace：工具箱 v'+self.app_version)   
+    self.setWindowTitle('Alex：工具箱 v'+self.app_version)   
     self.setMenubar() 
     self.setWindowFlags(Qt.WindowStaysOnTopHint)
   
